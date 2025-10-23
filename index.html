@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memory Map - Reset Password</title>
+    <title>PinnPals - Reset Password</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -99,8 +99,34 @@
 
         .password-requirements {
             font-size: 12px;
+            margin-top: 8px;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
             color: rgba(44, 44, 44, 0.6);
-            margin-top: 4px;
+            transition: color 0.2s;
+        }
+
+        .requirement.met {
+            color: #8CA659;
+        }
+
+        .req-icon {
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 14px;
+        }
+
+        .requirement.met .req-icon {
+            content: '✓';
+        }
+
+        .req-text {
+            font-size: 12px;
         }
 
         .button {
@@ -176,7 +202,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <div class="logo">🗺️ Memory Map</div>
+            <div class="logo">🗺️ PinnPals</div>
             <div class="subtitle">Secure Password Reset</div>
         </div>
 
@@ -189,13 +215,26 @@
             <form id="resetForm">
                 <div class="form-group">
                     <label for="password">New Password</label>
-                    <input type="password" id="password" required minlength="6">
-                    <div class="password-requirements">At least 6 characters</div>
+                    <input type="password" id="password" required minlength="8">
+                    <div class="password-requirements" id="passwordRequirements">
+                        <div class="requirement" id="req-length">
+                            <span class="req-icon">○</span>
+                            <span class="req-text">At least 8 characters</span>
+                        </div>
+                        <div class="requirement" id="req-letter">
+                            <span class="req-icon">○</span>
+                            <span class="req-text">Contains at least one letter</span>
+                        </div>
+                        <div class="requirement" id="req-number">
+                            <span class="req-icon">○</span>
+                            <span class="req-text">Contains at least one number</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" required minlength="6">
+                    <input type="password" id="confirmPassword" required minlength="8">
                 </div>
 
                 <button type="submit" class="button" id="submitBtn">
@@ -203,8 +242,8 @@
                 </button>
             </form>
 
-            <div class="return-link">
-                <a href="memorymap://signin">Return to Memory Map</a>
+            <div class="return-link" id="returnLink" style="display: none;">
+                <a href="memorymap://signin">Return to PinnPals</a>
             </div>
         </div>
     </div>
@@ -265,6 +304,24 @@
             console.log('✅ Valid password reset link detected');
         }
 
+        // Password validation function (matches iOS PasswordValidator.swift)
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 8 && password.length <= 64,
+                letter: /[a-zA-Z]/.test(password),
+                number: /[0-9]/.test(password)
+            };
+
+            const isValid = requirements.length && requirements.letter && requirements.number;
+            const unmetRequirements = [];
+
+            if (!requirements.length) unmetRequirements.push('At least 8 characters');
+            if (!requirements.letter) unmetRequirements.push('Contains at least one letter');
+            if (!requirements.number) unmetRequirements.push('Contains at least one number');
+
+            return { isValid, requirements, unmetRequirements };
+        }
+
         // Form submission
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -272,9 +329,10 @@
             const password = passwordInput.value;
             const confirmPassword = confirmPasswordInput.value;
 
-            // Validation
-            if (password.length < 6) {
-                showMessage('Password must be at least 6 characters long.', 'error');
+            // Validation using new requirements
+            const validation = validatePassword(password);
+            if (!validation.isValid) {
+                showMessage('Password must: ' + validation.unmetRequirements.join(', '), 'error');
                 return;
             }
 
@@ -360,7 +418,7 @@
             helpText.style.marginTop = '10px';
             helpText.innerHTML = `
                 <strong>What to do next:</strong><br>
-                1. Return to the Memory Map app<br>
+                1. Return to the PinnPals app<br>
                 2. Go to Sign In → "Forgot Password"<br>
                 3. Request a new password reset link<br>
                 4. Check your email and click the new link quickly
@@ -371,23 +429,48 @@
         }
 
         function addReturnToAppButton() {
-            // Check if button already exists
-            if (document.getElementById('returnToAppBtn')) return;
-
-            const returnBtn = document.createElement('button');
-            returnBtn.id = 'returnToAppBtn';
-            returnBtn.className = 'button';
-            returnBtn.style.marginTop = '20px';
-            returnBtn.style.background = 'linear-gradient(135deg, #8CA659 0%, #A6BF73 100%)';
-            returnBtn.textContent = 'Return to Memory Map';
-
-            returnBtn.addEventListener('click', () => {
-                window.location.href = 'memorymap://signin';
-            });
-
-            // Insert after the form
-            form.parentNode.insertBefore(returnBtn, form.nextSibling);
+            // Simply show the existing return link
+            const returnLink = document.getElementById('returnLink');
+            if (returnLink) {
+                returnLink.style.display = 'block';
+            }
         }
+
+        // Real-time password requirement validation
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const validation = validatePassword(password);
+
+            // Update length requirement
+            const lengthReq = document.getElementById('req-length');
+            if (validation.requirements.length) {
+                lengthReq.classList.add('met');
+                lengthReq.querySelector('.req-icon').textContent = '✓';
+            } else {
+                lengthReq.classList.remove('met');
+                lengthReq.querySelector('.req-icon').textContent = '○';
+            }
+
+            // Update letter requirement
+            const letterReq = document.getElementById('req-letter');
+            if (validation.requirements.letter) {
+                letterReq.classList.add('met');
+                letterReq.querySelector('.req-icon').textContent = '✓';
+            } else {
+                letterReq.classList.remove('met');
+                letterReq.querySelector('.req-icon').textContent = '○';
+            }
+
+            // Update number requirement
+            const numberReq = document.getElementById('req-number');
+            if (validation.requirements.number) {
+                numberReq.classList.add('met');
+                numberReq.querySelector('.req-icon').textContent = '✓';
+            } else {
+                numberReq.classList.remove('met');
+                numberReq.querySelector('.req-icon').textContent = '○';
+            }
+        });
 
         // Real-time password matching validation
         confirmPasswordInput.addEventListener('input', () => {
