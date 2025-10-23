@@ -6,8 +6,6 @@
     <title>Memory Map - Reset Password</title>
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
         * {
             margin: 0;
             padding: 0;
@@ -15,134 +13,215 @@
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #FAF5F0 0%, #EBE0D1 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', Arial, sans-serif;
+            background: #000000;
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: flex-end;
             justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 400px;
-            width: 100%;
-            background: #FFFFFF;
-            border-radius: 20px;
-            border: 3px solid #A66B33;
-            box-shadow: 0 8px 32px rgba(204, 133, 64, 0.15);
+            padding: 0;
             overflow: hidden;
         }
 
+        .container {
+            max-width: 100%;
+            width: 100%;
+            background: #FFFFFF;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            position: relative;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+            }
+            to {
+                transform: translateY(0);
+            }
+        }
+
+        @media (min-width: 600px) {
+            body {
+                align-items: center;
+                background: rgba(0, 0, 0, 0.4);
+            }
+            .container {
+                max-width: 480px;
+                border-radius: 16px;
+                margin: 20px;
+            }
+        }
+
+        .drag-handle {
+            width: 36px;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 3px;
+            margin: 12px auto 0;
+        }
+
         .header {
-            background: linear-gradient(45deg, #598CBF 0%, #73A6D9 100%);
-            padding: 30px;
+            background: transparent;
+            padding: 8px 20px 20px;
             text-align: center;
-            color: white;
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 28px;
+            margin-bottom: 4px;
         }
 
         .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
+            font-size: 13px;
+            color: rgba(60, 60, 67, 0.6);
+            font-weight: 400;
         }
 
         .content {
-            padding: 40px 30px;
+            padding: 0 20px 20px;
         }
 
         .title {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 600;
-            color: #2C2C2C;
-            margin-bottom: 8px;
+            color: #000000;
+            margin-bottom: 6px;
             text-align: center;
+            letter-spacing: -0.3px;
         }
 
         .description {
-            font-size: 14px;
-            color: rgba(44, 44, 44, 0.7);
+            font-size: 15px;
+            color: rgba(60, 60, 67, 0.6);
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 28px;
+            line-height: 1.4;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
         }
 
         label {
             display: block;
-            font-size: 14px;
-            font-weight: 500;
-            color: #2C2C2C;
-            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 400;
+            color: rgba(60, 60, 67, 0.6);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: -0.08px;
         }
 
         input {
             width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #E5E5E5;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.2s;
+            padding: 14px 12px;
+            border: none;
+            background: rgba(120, 120, 128, 0.12);
+            border-radius: 10px;
+            font-size: 17px;
+            transition: background-color 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
         }
 
         input:focus {
             outline: none;
-            border-color: #598CBF;
+            background: rgba(120, 120, 128, 0.16);
+        }
+
+        input::placeholder {
+            color: rgba(60, 60, 67, 0.3);
         }
 
         .password-requirements {
-            font-size: 12px;
-            color: rgba(44, 44, 44, 0.6);
-            margin-top: 4px;
+            font-size: 13px;
+            margin-top: 10px;
+            padding: 12px;
+            background: rgba(120, 120, 128, 0.08);
+            border-radius: 8px;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+            color: rgba(60, 60, 67, 0.6);
+            transition: all 0.2s ease;
+        }
+
+        .requirement:last-child {
+            margin-bottom: 0;
+        }
+
+        .requirement.met {
+            color: #34C759;
+        }
+
+        .req-icon {
+            font-size: 16px;
+            font-weight: 600;
+            min-width: 16px;
+            text-align: center;
+        }
+
+        .requirement.met .req-icon {
+            content: '✓';
+        }
+
+        .req-text {
+            font-size: 13px;
+            line-height: 1.3;
         }
 
         .button {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #598CBF 0%, #73A6D9 100%);
+            padding: 16px;
+            background: #007AFF;
             color: white;
             border: none;
             border-radius: 12px;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s;
+            transition: opacity 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+            margin-top: 8px;
+            min-height: 50px;
+            letter-spacing: -0.4px;
         }
 
-        .button:hover {
-            transform: translateY(-2px);
+        .button:active {
+            opacity: 0.7;
         }
 
         .button:disabled {
-            opacity: 0.6;
+            opacity: 0.4;
             cursor: not-allowed;
-            transform: none;
         }
 
         .message {
-            padding: 12px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 15px;
+            line-height: 1.4;
         }
 
         .error {
-            background: rgba(191, 89, 64, 0.08);
-            border: 1px solid rgba(191, 89, 64, 0.3);
-            color: #BF5940;
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.2);
+            color: #FF3B30;
         }
 
         .success {
-            background: rgba(140, 166, 89, 0.08);
-            border: 1px solid rgba(140, 166, 89, 0.3);
-            color: #8CA659;
+            background: rgba(52, 199, 89, 0.1);
+            border: 1px solid rgba(52, 199, 89, 0.2);
+            color: #34C759;
         }
 
         .loading {
@@ -162,22 +241,28 @@
 
         .return-link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 16px;
+            padding-bottom: 8px;
         }
 
         .return-link a {
-            color: #598CBF;
+            color: #007AFF;
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
+            font-size: 17px;
+            font-weight: 400;
+        }
+
+        .return-link a:active {
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="drag-handle"></div>
         <div class="header">
             <div class="logo">🗺️ Memory Map</div>
-            <div class="subtitle">Secure Password Reset</div>
+            <div class="subtitle">Password Reset</div>
         </div>
 
         <div class="content">
@@ -189,13 +274,26 @@
             <form id="resetForm">
                 <div class="form-group">
                     <label for="password">New Password</label>
-                    <input type="password" id="password" required minlength="6">
-                    <div class="password-requirements">At least 6 characters</div>
+                    <input type="password" id="password" required minlength="8">
+                    <div class="password-requirements" id="passwordRequirements">
+                        <div class="requirement" id="req-length">
+                            <span class="req-icon">○</span>
+                            <span class="req-text">At least 8 characters</span>
+                        </div>
+                        <div class="requirement" id="req-letter">
+                            <span class="req-icon">○</span>
+                            <span class="req-text">Contains at least one letter</span>
+                        </div>
+                        <div class="requirement" id="req-number">
+                            <span class="req-icon">○</span>
+                            <span class="req-text">Contains at least one number</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="confirmPassword">Confirm Password</label>
-                    <input type="password" id="confirmPassword" required minlength="6">
+                    <input type="password" id="confirmPassword" required minlength="8">
                 </div>
 
                 <button type="submit" class="button" id="submitBtn">
@@ -223,46 +321,81 @@
         const submitBtn = document.getElementById('submitBtn');
         const messageDiv = document.getElementById('message');
 
-        // Parse URL parameters
+        // Parse URL parameters for error handling
         const urlParams = new URLSearchParams(window.location.search);
-        const tokenHash = urlParams.get('token_hash');
-        const type = urlParams.get('type');
         const error = urlParams.get('error');
         const errorCode = urlParams.get('error_code');
         const errorDescription = urlParams.get('error_description');
+
+        // Session variables
+        let resetSession = null;
+        let sessionError = null;
 
         // DEBUG: Log all URL information
         console.log('=== PASSWORD RESET DEBUG INFO ===');
         console.log('Full URL:', window.location.href);
         console.log('URL Search:', window.location.search);
-        console.log('Token Hash:', tokenHash);
-        console.log('Type:', type);
-        console.log('Error:', error);
-        console.log('Error Code:', errorCode);
-        console.log('Error Description:', errorDescription);
+        console.log('URL Hash:', window.location.hash);
         console.log('All URL Params:', Object.fromEntries(urlParams));
         console.log('===============================');
 
-        // Check for Supabase error parameters first
+        // Check for Supabase error parameters first (from server-side redirects)
         if (error === 'access_denied' && errorCode === 'otp_expired') {
-            console.error('❌ Token expired error detected');
+            console.error('❌ Token expired error detected from server redirect');
             showExpiredTokenMessage();
             submitBtn.disabled = true;
         } else if (error) {
-            // Handle other types of errors
-            console.error('❌ Other error detected:', error, errorDescription);
+            // Handle other types of server errors
+            console.error('❌ Server error detected:', error, errorDescription);
             showMessage(`Reset failed: ${errorDescription || error}. Please request a new password reset.`, 'error');
             addReturnToAppButton();
             submitBtn.disabled = true;
-        } else if (!tokenHash || type !== 'recovery') {
-            // Original validation for missing parameters
-            const errorMsg = `Invalid password reset link. Token: ${tokenHash}, Type: ${type}`;
-            console.error(errorMsg);
-            showMessage('Invalid password reset link. Please request a new one.', 'error');
-            addReturnToAppButton();
-            submitBtn.disabled = true;
         } else {
-            console.log('✅ Valid password reset link detected');
+            // Try to get session from URL using Supabase SDK
+            console.log('🔄 Attempting to get session from URL...');
+            try {
+                const { data, error: sessionError } = await supabase.auth.getSessionFromUrl();
+
+                console.log('getSessionFromUrl response:', { data, error: sessionError });
+
+                if (sessionError) {
+                    console.error('❌ Session error:', sessionError);
+                    showMessage('Invalid or expired reset link. Please request a new password reset.', 'error');
+                    addReturnToAppButton();
+                    submitBtn.disabled = true;
+                } else if (data?.session) {
+                    console.log('✅ Valid session obtained from URL');
+                    resetSession = data.session;
+                } else {
+                    console.error('❌ No session found in URL');
+                    showMessage('Invalid reset link. Please request a new password reset.', 'error');
+                    addReturnToAppButton();
+                    submitBtn.disabled = true;
+                }
+            } catch (err) {
+                console.error('❌ Error getting session from URL:', err);
+                showMessage('Failed to process reset link. Please request a new password reset.', 'error');
+                addReturnToAppButton();
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Password validation function (matches iOS PasswordValidator.swift)
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 8 && password.length <= 64,
+                letter: /[a-zA-Z]/.test(password),
+                number: /[0-9]/.test(password)
+            };
+
+            const isValid = requirements.length && requirements.letter && requirements.number;
+            const unmetRequirements = [];
+
+            if (!requirements.length) unmetRequirements.push('At least 8 characters');
+            if (!requirements.letter) unmetRequirements.push('Contains at least one letter');
+            if (!requirements.number) unmetRequirements.push('Contains at least one number');
+
+            return { isValid, requirements, unmetRequirements };
         }
 
         // Form submission
@@ -272,9 +405,10 @@
             const password = passwordInput.value;
             const confirmPassword = confirmPasswordInput.value;
 
-            // Validation
-            if (password.length < 6) {
-                showMessage('Password must be at least 6 characters long.', 'error');
+            // Validation using new requirements
+            const validation = validatePassword(password);
+            if (!validation.isValid) {
+                showMessage('Password must: ' + validation.unmetRequirements.join(', '), 'error');
                 return;
             }
 
@@ -289,30 +423,15 @@
 
             try {
                 console.log('🔄 Starting password reset process...');
-                console.log('Token Hash being used:', tokenHash);
 
-                // Verify session with token
-                console.log('📡 Calling verifyOtp...');
-                const { data, error: verifyError } = await supabase.auth.verifyOtp({
-                    type: 'recovery',
-                    token_hash: tokenHash
-                });
-
-                console.log('verifyOtp response:', { data, error: verifyError });
-
-                if (verifyError) {
-                    console.error('❌ Token verification failed:', verifyError);
-                    throw new Error(`Token verification failed: ${verifyError.message}`);
+                // Check if we have a valid session
+                if (!resetSession) {
+                    throw new Error('No valid session found. Please use a fresh reset link.');
                 }
 
-                if (!data?.user) {
-                    console.error('❌ No user found in verification response');
-                    throw new Error('Invalid reset link. No user found.');
-                }
+                console.log('✅ Using session for user:', resetSession.user.id);
 
-                console.log('✅ Token verified successfully, user:', data.user.id);
-
-                // Update password
+                // Update password using the session
                 console.log('🔄 Updating password...');
                 const { data: updateData, error: updateError } = await supabase.auth.updateUser({
                     password: password
@@ -377,8 +496,8 @@
             const returnBtn = document.createElement('button');
             returnBtn.id = 'returnToAppBtn';
             returnBtn.className = 'button';
-            returnBtn.style.marginTop = '20px';
-            returnBtn.style.background = 'linear-gradient(135deg, #8CA659 0%, #A6BF73 100%)';
+            returnBtn.style.marginTop = '16px';
+            returnBtn.style.background = '#34C759';
             returnBtn.textContent = 'Return to Memory Map';
 
             returnBtn.addEventListener('click', () => {
@@ -388,6 +507,42 @@
             // Insert after the form
             form.parentNode.insertBefore(returnBtn, form.nextSibling);
         }
+
+        // Real-time password requirement validation
+        passwordInput.addEventListener('input', () => {
+            const password = passwordInput.value;
+            const validation = validatePassword(password);
+
+            // Update length requirement
+            const lengthReq = document.getElementById('req-length');
+            if (validation.requirements.length) {
+                lengthReq.classList.add('met');
+                lengthReq.querySelector('.req-icon').textContent = '✓';
+            } else {
+                lengthReq.classList.remove('met');
+                lengthReq.querySelector('.req-icon').textContent = '○';
+            }
+
+            // Update letter requirement
+            const letterReq = document.getElementById('req-letter');
+            if (validation.requirements.letter) {
+                letterReq.classList.add('met');
+                letterReq.querySelector('.req-icon').textContent = '✓';
+            } else {
+                letterReq.classList.remove('met');
+                letterReq.querySelector('.req-icon').textContent = '○';
+            }
+
+            // Update number requirement
+            const numberReq = document.getElementById('req-number');
+            if (validation.requirements.number) {
+                numberReq.classList.add('met');
+                numberReq.querySelector('.req-icon').textContent = '✓';
+            } else {
+                numberReq.classList.remove('met');
+                numberReq.querySelector('.req-icon').textContent = '○';
+            }
+        });
 
         // Real-time password matching validation
         confirmPasswordInput.addEventListener('input', () => {
